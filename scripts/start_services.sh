@@ -75,6 +75,8 @@ prepare_valhalla_data() {
 print_notes() {
   cat <<'EOF'
 Startup requested:
+- npm admin UI is available on http://localhost:8443
+- npm proxy entrypoints are available on http://localhost:8080 and https://localhost:4443
 - martin uses local MBTiles from martin/data
 - valhalla_shared builds from local PBF files in valhalla/shared
 - photon_shared downloads its own REGION=planet index into photon/shared on first boot if missing
@@ -92,7 +94,7 @@ main() {
   prepare_valhalla_data
   print_notes
 
-  docker compose -f "$ROOT_DIR/docker-compose.yml" up -d martin valhalla_shared photon_shared
+  docker compose -f "$ROOT_DIR/docker-compose.yml" up -d npm martin valhalla_shared photon_shared
 }
 
 main "$@"

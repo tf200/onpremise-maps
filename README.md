@@ -5,14 +5,25 @@ This setup keeps your original architecture but consolidates the heavy services:
 - `martin` serves vector tiles to MapLibre
 - `valhalla_shared` exposes one routing API for Morocco, Tunisia, and Italy
 - `photon_shared` exposes one search API for all supported countries
+- `npm` sits in front of those services and exposes the admin UI on `8443`
 
-There is no gateway or extra backend layer. Your app keeps calling each service API directly, but routing and search now use one shared endpoint each.
+The backend services do not expose their own UIs. They stay internal to Docker and are reached through NPM proxy hosts.
 
 ## Ports
 
-- `martin`: `http://localhost:3000`
-- `valhalla_shared`: `http://localhost:8002`
-- `photon_shared`: `http://localhost:2322`
+- `NPM admin`: `http://localhost:8443`
+- `NPM HTTP entrypoint`: `http://localhost:8080`
+- `NPM HTTPS entrypoint`: `https://localhost:4443`
+
+## NPM Setup
+
+Create these proxy hosts in the NPM admin UI:
+
+- `martin.localhost` -> `martin:3000`
+- `valhalla.localhost` -> `valhalla_shared:8002`
+- `photon.localhost` -> `photon_shared:2322`
+
+If you want HTTPS for the proxied APIs, attach an SSL certificate in NPM and serve them through the `4443` entrypoint.
 
 ## Data Layout
 
@@ -69,7 +80,7 @@ The script:
 
 - downloads missing Morocco and Tunisia `.mbtiles` files, plus the five Italy subregion `.mbtiles` files, into `martin/data/`
 - downloads missing Morocco, Tunisia, and Italy `.osm.pbf` files into `valhalla/shared/`
-- starts `martin`, `valhalla_shared`, and `photon_shared`
+- starts `npm`, `martin`, `valhalla_shared`, and `photon_shared`
 
 Photon still downloads and extracts the shared `planet` index into `photon/shared/` on first boot if it is missing.
 
@@ -81,31 +92,30 @@ Photon still downloads and extracts the shared `planet` index into `photon/share
 
 ## App Integration
 
-Keep MapLibre pointed at `martin`, and point all supported countries to the same routing and search endpoints:
+Keep MapLibre and the app pointed at NPM proxy hosts instead of the raw backend containers:
 
-- Routing: `:8002`
-- Search: `:2322`
+- Tiles: `http://martin.localhost:8080` or `https://martin.localhost:4443`
+- Routing: `http://valhalla.localhost:8080` or `https://valhalla.localhost:4443`
+- Search: `http://photon.localhost:8080` or `https://photon.localhost:4443`
 
-This removes per-country endpoint switching from the app.
+This keeps the backend containers off the host network and makes NPM the only public entrypoint for the APIs.
 
 ## Verification
 
-Check Martin catalog:
+Check NPM admin is up:
 
 ```bash
-curl http://localhost:3000/catalog
+curl -I http://localhost:8443
 ```
 
-Check Valhalla status:
+Check Martin catalog through NPM:
 
 ```bash
-curl -X POST http://localhost:8002/status
+curl http://martin.localhost:8080/catalog
 ```
 
-Check Photon:
+Check Valhalla status through NPM:
 
 ```bash
-curl "http://localhost:2322/api?q=casablanca"
-curl "http://localhost:2322/api?q=tunis"
-curl "http://localhost:2322/api?q=rome"
+curl -X POST http://valhalla.localhost:8080/status
 ```

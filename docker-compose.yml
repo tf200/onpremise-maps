@@ -1,9 +1,24 @@
 services:
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+      - "8443:81"
+      - "4443:443"
+    depends_on:
+      - martin
+      - valhalla_shared
+      - photon_shared
+    volumes:
+      - npm_data:/data
+      - npm_letsencrypt:/etc/letsencrypt
+
   martin:
     image: ghcr.io/maplibre/martin:latest
     restart: unless-stopped
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     volumes:
       - ./martin/data:/files
     command: /files
@@ -11,8 +26,8 @@ services:
   valhalla_shared:
     image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
     restart: unless-stopped
-    ports:
-      - "8002:8002"
+    expose:
+      - "8002"
     volumes:
       - ./valhalla/shared:/custom_files
       - ./valhalla/valhalla.json:/custom_files/valhalla.json:ro
@@ -20,10 +35,14 @@ services:
   photon_shared:
     image: rtuszik/photon-docker:latest
     restart: unless-stopped
-    ports:
-      - "2322:2322"
+    expose:
+      - "2322"
     environment:
       - REGION=planet
       - UPDATE_INTERVAL=720h
     volumes:
       - ./photon/shared:/photon/data
+
+volumes:
+  npm_data:
+  npm_letsencrypt:
