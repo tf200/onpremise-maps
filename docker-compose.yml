@@ -1,0 +1,29 @@
+services:
+  martin:
+    image: ghcr.io/maplibre/martin:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./martin/data:/files
+    command: /files
+
+  valhalla_shared:
+    image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./valhalla/shared:/custom_files
+      - ./valhalla/valhalla.json:/custom_files/valhalla.json:ro
+
+  photon_shared:
+    image: rtuszik/photon-docker:latest
+    restart: unless-stopped
+    ports:
+      - "2322:2322"
+    environment:
+      - REGION=planet
+      - UPDATE_INTERVAL=720h
+    volumes:
+      - ./photon/shared:/photon/data

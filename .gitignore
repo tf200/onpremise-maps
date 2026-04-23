@@ -1,0 +1,12 @@
+# Workspace artifact
+.codex
+
+# Generated map data
+martin/data/*
+photon/shared/*
+valhalla/shared/*
+
+# Keep placeholder files if the directories are checked out empty
+!martin/data/.gitkeep
+!photon/shared/.gitkeep
+!valhalla/shared/.gitkeep
