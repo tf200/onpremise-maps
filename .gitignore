@@ -3,10 +3,12 @@
 
 # Generated map data
 martin/data/*
+martin/raw/*
 photon/shared/*
 valhalla/shared/*
 
 # Keep placeholder files if the directories are checked out empty
 !martin/data/.gitkeep
+!martin/raw/.gitkeep
 !photon/shared/.gitkeep
 !valhalla/shared/.gitkeep

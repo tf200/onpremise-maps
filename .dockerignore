@@ -1,4 +1,5 @@
 # Exclude large generated map assets from Docker build contexts
 martin/data/
+martin/raw/
 photon/shared/
 valhalla/shared/

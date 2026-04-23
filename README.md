@@ -29,10 +29,10 @@ If you want HTTPS for the proxied APIs, attach an SSL certificate in NPM and ser
 
 ### Martin
 
-Put one tile archive per country in `martin/data/`:
+Martin now serves a single merged MBTiles source:
 
 ```text
-martin/data/
+martin/raw/
   morocco.mbtiles
   tunisia.mbtiles
   italy-centro.mbtiles
@@ -40,11 +40,16 @@ martin/data/
   italy-nord-est.mbtiles
   italy-nord-ovest.mbtiles
   italy-sud.mbtiles
+
+martin/data/
+  basemap.mbtiles
 ```
 
-`martin` will discover all files in that directory automatically.
+`martin` only reads `martin/data/`, so clients see one tile source (`basemap`).
 
 Geofabrik does not publish a single Italy shortbread MBTiles file. Italy is split into five subregion MBTiles downloads, and the bootstrap script downloads all five.
+The bootstrap script merges all raw MBTiles with `tile-join` (Tippecanoe via Docker) into `martin/data/basemap.mbtiles`.
+By default it uses `klokantech/tippecanoe:latest` (override with `TIPPECANOE_IMAGE` if needed).
 
 ### Valhalla
 
@@ -78,7 +83,8 @@ Use the bootstrap script:
 
 The script:
 
-- downloads missing Morocco and Tunisia `.mbtiles` files, plus the five Italy subregion `.mbtiles` files, into `martin/data/`
+- downloads missing Morocco and Tunisia `.mbtiles` files, plus the five Italy subregion `.mbtiles` files, into `martin/raw/`
+- merges raw MBTiles into `martin/data/basemap.mbtiles` when inputs change (or when merged output is missing)
 - downloads missing Morocco, Tunisia, and Italy `.osm.pbf` files into `valhalla/shared/`
 - starts `npm`, `martin`, `valhalla_shared`, and `photon_shared`
 
@@ -88,6 +94,7 @@ Photon still downloads and extracts the shared `planet` index into `photon/share
 
 - `Valhalla` routing works only for the countries in the shared routing graph: Morocco, Tunisia, and Italy.
 - `Photon` search is broader than app support because it uses `planet`.
+- `Martin` exposes one merged tile source: `basemap`.
 - If you later need Photon to return only Morocco, Tunisia, and Italy, you will need a custom Photon import/build instead of the ready-made `REGION` download.
 
 ## App Integration
@@ -97,6 +104,8 @@ Keep MapLibre and the app pointed at NPM proxy hosts instead of the raw backend 
 - Tiles: `http://martin.localhost:8080` or `https://martin.localhost:4443`
 - Routing: `http://valhalla.localhost:8080` or `https://valhalla.localhost:4443`
 - Search: `http://photon.localhost:8080` or `https://photon.localhost:4443`
+
+For vector tile URLs in the client, use the `basemap` source id from Martin's catalog.
 
 This keeps the backend containers off the host network and makes NPM the only public entrypoint for the APIs.
 
