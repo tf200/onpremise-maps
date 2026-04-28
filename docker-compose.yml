@@ -38,7 +38,7 @@ services:
     expose:
       - "2322"
     environment:
-      - REGION=tunisia
+      - REGION=TN
       - UPDATE_INTERVAL=720h
     volumes:
       - ./photon/shared:/photon/data
