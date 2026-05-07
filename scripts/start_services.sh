@@ -13,7 +13,8 @@ TIPPECANOE_IMAGE="${TIPPECANOE_IMAGE:-klokantech/tippecanoe:latest}"
 declare -A PBF_URLS=(
   [morocco]="https://download.geofabrik.de/africa/morocco-latest.osm.pbf"
   [tunisia]="https://download.geofabrik.de/africa/tunisia-latest.osm.pbf"
-  [italy]="https://download.geofabrik.de/europe/italy-latest.osm.pbf"
+  [italy_north_east]="https://download.geofabrik.de/europe/italy/nord-est-latest.osm.pbf"
+  [italy_north_west]="https://download.geofabrik.de/europe/italy/nord-ovest-latest.osm.pbf"
 )
 
 declare -A MBTILES_URLS=(
