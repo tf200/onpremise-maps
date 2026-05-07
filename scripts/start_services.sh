@@ -22,11 +22,8 @@ declare -A MBTILES_URLS=(
 )
 
 ITALY_MBTILES=(
-  "https://download.geofabrik.de/europe/italy/centro-shortbread-1.0.mbtiles italy-centro.mbtiles"
-  "https://download.geofabrik.de/europe/italy/isole-shortbread-1.0.mbtiles italy-isole.mbtiles"
   "https://download.geofabrik.de/europe/italy/nord-est-shortbread-1.0.mbtiles italy-nord-est.mbtiles"
   "https://download.geofabrik.de/europe/italy/nord-ovest-shortbread-1.0.mbtiles italy-nord-ovest.mbtiles"
-  "https://download.geofabrik.de/europe/italy/sud-shortbread-1.0.mbtiles italy-sud.mbtiles"
 )
 
 ensure_command() {
@@ -86,10 +83,16 @@ migrate_legacy_martin_data() {
 }
 
 compute_martin_inputs_digest() {
-  find "$MARTIN_RAW_DIR" -maxdepth 1 -type f -name '*.mbtiles' -printf '%f|%s|%T@\n' \
-    | sort \
-    | sha256sum \
-    | awk '{print $1}'
+  local f
+  for f in "$MARTIN_RAW_DIR"/*.mbtiles; do
+    [[ -f "$f" ]] || continue
+    # name | size | mtime
+    if stat -f '%N|%z|%m' "$f" 2>/dev/null; then
+      :  # macOS/BSD stat worked
+    else
+      stat -c '%n|%s|%Y' "$f"  # GNU stat
+    fi
+  done | awk -F'|' '{ sub(".*/", "", $1); print }' | sort | sha256sum | awk '{print $1}'
 }
 
 merge_martin_tiles_if_needed() {
