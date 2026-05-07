@@ -13,8 +13,9 @@ TIPPECANOE_IMAGE="${TIPPECANOE_IMAGE:-klokantech/tippecanoe:latest}"
 declare -A PBF_URLS=(
   [morocco]="https://download.geofabrik.de/africa/morocco-latest.osm.pbf"
   [tunisia]="https://download.geofabrik.de/africa/tunisia-latest.osm.pbf"
-  [italy_north_east]="https://download.geofabrik.de/europe/italy/nord-est-latest.osm.pbf"
-  [italy_north_west]="https://download.geofabrik.de/europe/italy/nord-ovest-latest.osm.pbf"
+# disabling italy as it's causing problems with the tiles building
+ # [italy_north_east]="https://download.geofabrik.de/europe/italy/nord-est-latest.osm.pbf"
+ # [italy_north_west]="https://download.geofabrik.de/europe/italy/nord-ovest-latest.osm.pbf"
 )
 
 declare -A MBTILES_URLS=(
@@ -23,8 +24,8 @@ declare -A MBTILES_URLS=(
 )
 
 ITALY_MBTILES=(
-  "https://download.geofabrik.de/europe/italy/nord-est-shortbread-1.0.mbtiles italy-nord-est.mbtiles"
-  "https://download.geofabrik.de/europe/italy/nord-ovest-shortbread-1.0.mbtiles italy-nord-ovest.mbtiles"
+ # "https://download.geofabrik.de/europe/italy/nord-est-shortbread-1.0.mbtiles italy-nord-est.mbtiles"
+ # "https://download.geofabrik.de/europe/italy/nord-ovest-shortbread-1.0.mbtiles italy-nord-ovest.mbtiles"
 )
 
 ensure_command() {
